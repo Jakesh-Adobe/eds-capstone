@@ -1,7 +1,8 @@
 /* header and nav layout */
 header .nav-wrapper {
-  background-color: var(--background-color);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--color-black);
+  color: var(--color-white);
+  border-bottom: 1px solid var(--color-grey-500);
   width: 100%;
   z-index: 2;
   position: fixed;
@@ -73,7 +74,7 @@ header nav .nav-hamburger button {
   border: 0;
   border-radius: 0;
   padding: 0;
-  background-color: var(--background-color);
+  background-color: transparent;
   color: inherit;
   overflow: initial;
   text-overflow: initial;
@@ -143,16 +144,30 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 /* brand */
 header .nav-brand {
   grid-area: brand;
-  flex-basis: 128px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-basis: auto;
   font-size: var(--heading-4xl);
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1;
 }
 
+header .nav-brand .button-container,
+header .nav-brand p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
 header nav .nav-brand img {
-  width: 128px;
-  height: auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 /* sections */
@@ -248,6 +263,7 @@ header nav .nav-sections ul > li > ul > li {
     top: 150%;
     padding: 16px;
     background-color: var(--light-color);
+    color: var(--text-color);
     white-space: initial;
   }
 
@@ -318,11 +334,12 @@ header nav .nav-cart-toggle {
 header nav a.nav-tool:hover,
 header nav .nav-cart-toggle:hover {
   background-color: var(--light-color);
+  color: var(--text-color);
 }
 
 header nav a.nav-tool:focus-visible,
 header nav .nav-cart-toggle:focus-visible {
-  outline: 2px solid var(--color-black);
+  outline: 2px solid var(--color-white);
   outline-offset: 2px;
 }
 
@@ -363,6 +380,7 @@ header nav .mini-cart {
   border-radius: var(--radius-m);
   padding: 16px;
   background-color: var(--background-color);
+  color: var(--text-color);
   box-shadow: 0 12px 32px rgb(0 0 0 / 12%);
   font-size: var(--body-sm);
 }

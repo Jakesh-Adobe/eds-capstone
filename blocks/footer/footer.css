@@ -14,6 +14,19 @@ footer .footer p {
   margin: 0;
 }
 
+/* authored logo — AEM wraps authored images in <picture>, unlike icon glyphs (plain <img>) */
+footer .footer picture {
+  display: inline-block;
+  max-width: 120px;
+}
+
+footer .footer picture img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 /* link columns — one section per authored column */
 footer .footer .columns > div {
   display: grid;
