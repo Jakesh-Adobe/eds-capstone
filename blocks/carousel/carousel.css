@@ -1,0 +1,149 @@
+.carousel .carousel-slides-container {
+  position: relative;
+}
+
+.carousel .carousel-slides {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  overflow: scroll clip;
+}
+
+.carousel .carousel-slides::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel .carousel-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 420px;
+}
+
+/* image half */
+.carousel .carousel-slide-image {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 240px;
+}
+
+.carousel .carousel-slide-image picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel .carousel-slide-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+}
+
+/* content half — green, to echo the plants, with white text */
+.carousel .carousel-slide-content {
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px var(--content-padding);
+  background-color: var(--color-secondary-shade);
+  color: var(--color-white);
+}
+
+.carousel .carousel-slide-content h1,
+.carousel .carousel-slide-content h2,
+.carousel .carousel-slide-content h3 {
+  margin: 0;
+  color: inherit;
+}
+
+.carousel .carousel-slide-content p {
+  margin: 0;
+  max-width: 46ch;
+}
+
+@media (width >= 700px) {
+  .carousel .carousel-slide {
+    flex-direction: row;
+    min-height: min(50vw, 560px);
+  }
+
+  .carousel .carousel-slide-image,
+  .carousel .carousel-slide-content {
+    flex: 0 0 50%;
+    width: 50%;
+    min-height: 100%;
+  }
+
+  .carousel .carousel-slide-content {
+    padding: 64px;
+  }
+}
+
+/* prev/next controls */
+.carousel .carousel-navigation-buttons {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  right: 12px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.carousel .carousel-navigation-buttons button {
+  pointer-events: auto;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background-color: rgb(19 19 19 / 40%);
+  color: var(--color-white);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.carousel .carousel-navigation-buttons button:hover,
+.carousel .carousel-navigation-buttons button:focus-visible {
+  background-color: rgb(19 19 19 / 75%);
+}
+
+.carousel .carousel-navigation-buttons button::after {
+  display: block;
+  content: '';
+  border: 2px solid;
+  border-bottom: 0;
+  border-left: 0;
+  height: 12px;
+  width: 12px;
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 2px);
+  transform: translate(-50%, -50%) rotate(-135deg);
+}
+
+.carousel .carousel-navigation-buttons button.slide-next::after {
+  transform: translate(-50%, -50%) rotate(45deg);
+  left: calc(50% - 2px);
+}
+
+@media (width >= 600px) {
+  .carousel .carousel-navigation-buttons {
+    left: 24px;
+    right: 24px;
+  }
+}
