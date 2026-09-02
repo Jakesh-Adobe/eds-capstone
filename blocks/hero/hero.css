@@ -5,23 +5,25 @@
 
 .hero {
   position: relative;
-  padding: 40px 24px;
-  min-height: 300px;
+  display: flex;
+  align-items: flex-end;
+  box-sizing: border-box;
+  min-height: 460px;
+  padding: 48px var(--content-padding);
+  color: var(--color-white);
+  isolation: isolate;
 }
 
-.hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: var(--background-color);
+.hero > div {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
 }
 
 .hero picture {
   position: absolute;
-  z-index: -1;
+  z-index: -2;
   inset: 0;
-  object-fit: cover;
-  box-sizing: border-box;
 }
 
 .hero img {
@@ -30,8 +32,63 @@
   height: 100%;
 }
 
+/* scrim keeps the headline legible over any photograph */
+.hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 62%) 0%, rgb(0 0 0 / 20%) 55%, transparent 100%);
+}
+
+.hero h1,
+.hero h2 {
+  max-width: 14ch;
+  margin: 0;
+  color: inherit;
+}
+
+.hero p {
+  max-width: 46ch;
+  margin: 12px 0 0;
+  font-size: var(--body-lg);
+}
+
+.hero .button-wrapper {
+  margin-top: 24px;
+}
+
+/* eyebrow — a paragraph authored above the heading */
+.hero > div > p:first-child {
+  margin: 0 0 8px;
+  font-size: var(--label-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* compact variant — category page intros */
+.hero.compact {
+  align-items: center;
+  min-height: 240px;
+}
+
+.hero.compact h1 {
+  font-size: var(--heading-7xl);
+}
+
+/* light variant — dark text over a pale image */
+.hero.light {
+  color: var(--text-color);
+}
+
+.hero.light::before {
+  background: linear-gradient(90deg, rgb(255 255 255 / 70%) 0%, transparent 70%);
+}
+
 @media (width >= 900px) {
   .hero {
-    padding: 40px 32px;
+    min-height: 560px;
+    padding: 64px var(--content-padding);
   }
 }

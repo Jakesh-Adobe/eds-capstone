@@ -1,5 +1,8 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import {
+  getItems, getTotals, onChange, removeItem, formatPrice,
+} from '../../scripts/cart.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -108,6 +111,125 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
+const ICONS = {
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
+  user: '<circle cx="12" cy="8" r="3.5"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+  cart: '<path d="M4 7h16v11a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7Z"/><path d="M9 11a3 3 0 0 0 6 0"/>',
+};
+
+/* icons are inlined rather than loaded from /icons so they inherit currentColor */
+function iconMarkup(name) {
+  return `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true" focusable="false">${ICONS[name]}</svg>`;
+}
+
+function renderMiniCart(panel) {
+  const items = getItems();
+  const totals = getTotals();
+  if (!items.length) {
+    panel.innerHTML = '<p class="mini-cart-empty">Your cart is empty.</p>';
+    return;
+  }
+  const lines = items.map((item) => `
+    <li class="mini-cart-item" data-sku="${item.sku}">
+      ${item.image ? `<img src="${item.image}" alt="" loading="lazy" width="56" height="56">` : '<span class="mini-cart-thumb"></span>'}
+      <span class="mini-cart-detail">
+        <a href="${item.path}">${item.name}</a>
+        <span class="mini-cart-meta">${item.qty} &times; ${formatPrice(item.price, item.currency)}</span>
+      </span>
+      <button type="button" class="mini-cart-remove" aria-label="Remove ${item.name}">&times;</button>
+    </li>`).join('');
+  panel.innerHTML = `
+    <ul class="mini-cart-items">${lines}</ul>
+    <p class="mini-cart-subtotal"><span>Subtotal</span><span>${formatPrice(totals.subtotal, totals.currency)}</span></p>
+    <p class="mini-cart-actions">
+      <a class="button secondary" href="/cart">View cart</a>
+      <a class="button accent" href="/checkout">Checkout</a>
+    </p>`;
+  panel.querySelectorAll('.mini-cart-remove').forEach((btn) => {
+    btn.addEventListener('click', () => removeItem(btn.closest('.mini-cart-item').dataset.sku));
+  });
+}
+
+function buildCartTool(link) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'nav-cart';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'nav-cart-toggle';
+  trigger.setAttribute('aria-expanded', 'false');
+  trigger.setAttribute('aria-label', 'Cart');
+  trigger.innerHTML = `${iconMarkup('cart')}<span class="nav-cart-count" aria-hidden="true">0</span>`;
+
+  const panel = document.createElement('div');
+  panel.className = 'mini-cart';
+  panel.hidden = true;
+
+  const close = () => {
+    panel.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+
+  trigger.addEventListener('click', () => {
+    const open = trigger.getAttribute('aria-expanded') === 'true';
+    if (open) {
+      close();
+      return;
+    }
+    renderMiniCart(panel);
+    panel.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+  });
+
+  wrapper.addEventListener('focusout', (e) => {
+    if (!wrapper.contains(e.relatedTarget)) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape' && !panel.hidden) {
+      close();
+      trigger.focus();
+    }
+  });
+
+  const syncCount = () => {
+    const { count } = getTotals();
+    trigger.querySelector('.nav-cart-count').textContent = count;
+    trigger.dataset.empty = count === 0;
+    trigger.setAttribute('aria-label', `Cart, ${count} item${count === 1 ? '' : 's'}`);
+    if (!panel.hidden) renderMiniCart(panel);
+  };
+  onChange(syncCount);
+  syncCount();
+
+  wrapper.append(trigger, panel);
+  link.replaceWith(wrapper);
+}
+
+/**
+ * Turns authored nav-tools links into icon controls based on their target path.
+ * @param {Element} navTools The nav tools container
+ */
+function decorateNavTools(navTools) {
+  if (!navTools) return;
+  navTools.querySelectorAll('a[href]').forEach((link) => {
+    const { pathname } = new URL(link.href, window.location);
+    const label = link.textContent.trim();
+    if (pathname === '/cart') {
+      buildCartTool(link);
+    } else if (pathname === '/account') {
+      link.classList.add('nav-tool');
+      link.setAttribute('aria-label', label || 'My account');
+      link.innerHTML = iconMarkup('user');
+    } else if (pathname === '/search') {
+      link.classList.add('nav-tool');
+      link.setAttribute('aria-label', label || 'Search');
+      link.innerHTML = iconMarkup('search');
+    }
+  });
+}
+
 /**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
@@ -163,6 +285,8 @@ export default async function decorate(block) {
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+
+  decorateNavTools(nav.querySelector('.nav-tools'));
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';

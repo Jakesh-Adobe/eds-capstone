@@ -1,6 +1,7 @@
 /* header and nav layout */
 header .nav-wrapper {
   background-color: var(--background-color);
+  border-bottom: 1px solid var(--border-color);
   width: 100%;
   z-index: 2;
   position: fixed;
@@ -143,8 +144,9 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 header .nav-brand {
   grid-area: brand;
   flex-basis: 128px;
-  font-size: var(--heading-font-size-s);
-  font-weight: 700;
+  font-size: var(--heading-4xl);
+  font-weight: 500;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 
@@ -269,4 +271,178 @@ header nav .nav-sections ul > li > ul > li {
 /* tools */
 header nav .nav-tools {
   grid-area: tools;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- nav-sections rules above target ul too */
+header nav .nav-tools ul {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+header nav .nav-tools p {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+header nav .nav-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+header nav a.nav-tool,
+header nav .nav-cart-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  padding: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+header nav a.nav-tool:hover,
+header nav .nav-cart-toggle:hover {
+  background-color: var(--light-color);
+}
+
+header nav a.nav-tool:focus-visible,
+header nav .nav-cart-toggle:focus-visible {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+}
+
+/* cart */
+header nav .nav-cart {
+  position: relative;
+}
+
+header nav .nav-cart-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 17px;
+  height: 17px;
+  border-radius: var(--radius-pill);
+  padding: 0 4px;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 17px;
+  text-align: center;
+}
+
+header nav .nav-cart-toggle[data-empty='true'] .nav-cart-count {
+  display: none;
+}
+
+/* mini cart */
+header nav .mini-cart {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 3;
+  box-sizing: border-box;
+  width: min(340px, calc(100vw - 32px));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-m);
+  padding: 16px;
+  background-color: var(--background-color);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 12%);
+  font-size: var(--body-sm);
+}
+
+header nav .mini-cart-empty {
+  margin: 8px 0;
+  color: var(--text-muted-color);
+  text-align: center;
+}
+
+header nav .mini-cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 320px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+header nav .mini-cart-item {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+header nav .mini-cart-item img,
+header nav .mini-cart-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-s);
+  background-color: var(--light-color);
+  object-fit: cover;
+}
+
+header nav .mini-cart-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+header nav .mini-cart-detail a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+header nav .mini-cart-meta {
+  color: var(--text-muted-color);
+  font-size: var(--body-xs);
+}
+
+header nav .mini-cart-remove {
+  border: 0;
+  padding: 4px 8px;
+  background: none;
+  color: var(--text-muted-color);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+header nav .mini-cart-subtotal {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  font-weight: 500;
+}
+
+header nav .mini-cart-actions {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+}
+
+header nav .mini-cart-actions .button {
+  flex: 1;
 }
