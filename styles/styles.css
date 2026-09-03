@@ -377,6 +377,13 @@ main > .section > div {
 }
 
 main > .section:first-of-type {
+  margin-top: var(--section-spacing);
+}
+
+/* full-bleed heroes/promos should still sit flush against the nav */
+main > .section:first-of-type:has(.carousel),
+main > .section:first-of-type:has(.hero),
+main > .section.promo:first-of-type {
   margin-top: 0;
 }
 
