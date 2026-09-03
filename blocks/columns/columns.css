@@ -60,7 +60,8 @@
 @media (width >= 900px) {
   .columns.promo > div {
     align-items: stretch;
-    min-height: 460px;
+    height: 50dvh;
+    min-height: 320px;
   }
 
   .columns.promo > div > div:not(.columns-img-col) {
