@@ -1,9 +1,4 @@
-/* keep the whole filmstrip narrow enough that each tile stays portrait, even the enlarged one */
-.product-gallery {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
+/* full width — flex 2:1:1 below already yields a 50% / 25% / 25% split */
 .product-gallery-items {
   display: flex;
   gap: 8px;
