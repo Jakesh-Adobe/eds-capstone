@@ -1,0 +1,39 @@
+.related-products-heading {
+  margin: 0 0 16px;
+}
+
+.related-products-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.related-products-card a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.related-products-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.related-products-body {
+  margin-top: 8px;
+}
+
+.related-products-body h3 {
+  margin: 0 0 4px;
+  font-size: var(--heading-2xl);
+}
+
+.related-products-price {
+  margin: 0;
+  color: var(--price-color);
+  font-weight: 500;
+}

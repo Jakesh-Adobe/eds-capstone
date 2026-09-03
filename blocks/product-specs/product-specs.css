@@ -1,0 +1,23 @@
+.product-specs {
+  border-top: 1px solid var(--border-color);
+}
+
+.product-specs-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.product-specs-row-alt {
+  background-color: var(--light-color);
+}
+
+.product-specs-key {
+  font-weight: 500;
+}
+
+.product-specs-value {
+  color: var(--text-muted-color);
+}
