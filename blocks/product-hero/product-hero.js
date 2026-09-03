@@ -6,24 +6,32 @@ import { addItem, formatPrice } from '../../scripts/cart.js';
  * @param {Element} block The product-hero block element
  */
 export default function decorate(block) {
-  const row = block.children[0];
-  if (!row) return;
+  /* merge every authored row into exactly one image column + one content column,
+     so it still lays out side-by-side even if the image/copy were authored as
+     separate rows instead of a single 2-column row */
+  const image = document.createElement('div');
+  image.className = 'product-hero-image';
+  const content = document.createElement('div');
+  content.className = 'product-hero-content';
 
-  [...row.children].forEach((col) => {
-    col.className = (col.children.length === 1 && col.querySelector('picture'))
-      ? 'product-hero-image'
-      : 'product-hero-content';
+  [...block.children].forEach((row) => {
+    [...row.children].forEach((col) => {
+      const target = (col.children.length === 1 && col.querySelector('picture'))
+        ? image
+        : content;
+      while (col.firstChild) target.append(col.firstChild);
+    });
   });
 
-  const content = block.querySelector('.product-hero-content');
-  if (!content) return;
+  block.replaceChildren(image, content);
+  if (!content.hasChildNodes()) return;
 
   const sku = getMetadata('sku');
   const price = getMetadata('price');
   const currency = getMetadata('currency') || 'USD';
   const heading = content.querySelector('h1, h2');
   const name = heading ? heading.textContent.trim() : document.title;
-  const image = block.querySelector('.product-hero-image img')?.src || '';
+  const heroImage = image.querySelector('img')?.src || '';
 
   if (price && heading) {
     const priceEl = document.createElement('p');
@@ -37,7 +45,7 @@ export default function decorate(block) {
     cta.addEventListener('click', (e) => {
       e.preventDefault();
       addItem({
-        sku, name, price, currency, image, path: window.location.pathname,
+        sku, name, price, currency, image: heroImage, path: window.location.pathname,
       });
       const original = cta.textContent;
       cta.textContent = 'Added';

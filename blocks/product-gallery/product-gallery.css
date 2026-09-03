@@ -4,7 +4,8 @@
 
 .product-gallery-viewer img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 50dvh;
+  max-height: 50dvh;
   object-fit: cover;
 }
 

@@ -10,7 +10,14 @@ export default function decorate(block) {
 
   const viewer = document.createElement('div');
   viewer.className = 'product-gallery-viewer';
-  viewer.append(createOptimizedPicture(images[0].src, images[0].alt, true, [{ width: '1000' }]));
+
+  /* swap the whole <picture> (not just the <img> src) — the <source> srcsets
+     take priority over the fallback <img>, so only replacing img.src would
+     leave the previous image showing in browsers that support <picture> */
+  const setMainImage = (img) => {
+    viewer.replaceChildren(createOptimizedPicture(img.src, img.alt, true, [{ width: '1000' }]));
+  };
+  setMainImage(images[0]);
 
   const thumbs = document.createElement('ul');
   thumbs.className = 'product-gallery-thumbs';
@@ -24,9 +31,7 @@ export default function decorate(block) {
     button.setAttribute('aria-current', idx === 0 ? 'true' : 'false');
     button.append(createOptimizedPicture(img.src, img.alt, false, [{ width: '150' }]));
     button.addEventListener('click', () => {
-      const mainImg = viewer.querySelector('img');
-      mainImg.src = img.src;
-      mainImg.alt = img.alt;
+      setMainImage(img);
       thumbs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-current', 'false'));
       button.setAttribute('aria-current', 'true');
     });
