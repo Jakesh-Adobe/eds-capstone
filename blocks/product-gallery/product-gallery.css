@@ -1,6 +1,7 @@
 /* full width — flex 2:1:1 below already yields a 50% / 25% / 25% split */
 .product-gallery-items {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin: 0;
   padding: 0;
@@ -8,16 +9,20 @@
   height: 420px;
 }
 
+/* shrink width AND height together so the selected tile grows to its fixed
+   full size instead of just stretching wider (which made object-fit crop/zoom) */
 .product-gallery-item {
   flex: 1;
+  height: 50%;
   min-width: 0;
   overflow: hidden;
   border-radius: var(--radius-s);
-  transition: flex 0.3s ease;
+  transition: flex 0.3s ease, height 0.3s ease;
 }
 
 .product-gallery-item[aria-current='true'] {
   flex: 2;
+  height: 100%;
 }
 
 .product-gallery-item button {
