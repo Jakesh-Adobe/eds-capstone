@@ -63,6 +63,16 @@ export async function getProductsByCategory(category) {
 }
 
 /**
+ * Distinct category slugs present across all products, alphabetically sorted.
+ * @returns {Promise<Array<string>>}
+ */
+export async function getAllCategories() {
+  const products = await getAllProducts();
+  const categories = new Set(products.map((product) => product.category).filter(Boolean));
+  return [...categories].sort();
+}
+
+/**
  * A single product by SKU.
  * @param {string} sku
  * @returns {Promise<object|undefined>}

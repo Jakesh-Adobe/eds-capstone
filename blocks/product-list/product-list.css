@@ -47,3 +47,26 @@
   color: var(--text-muted-color);
   text-align: center;
 }
+
+.product-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 24px;
+}
+
+.product-list-filter {
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: var(--body-font-size-s);
+  cursor: pointer;
+}
+
+.product-list-filter[aria-pressed="true"] {
+  background-color: var(--color-black);
+  border-color: var(--color-black);
+  color: var(--color-white);
+}

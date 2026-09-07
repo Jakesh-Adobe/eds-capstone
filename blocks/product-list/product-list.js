@@ -45,18 +45,71 @@ function renderCard(product) {
   return li;
 }
 
+function renderGrid(products) {
+  const list = document.createElement('ul');
+  list.className = 'product-list-grid';
+  if (!products.length) {
+    list.innerHTML = '<li class="product-list-empty">No products found.</li>';
+    return list;
+  }
+  products.forEach((product) => list.append(renderCard(product)));
+  return list;
+}
+
+/**
+ * Renders an "All" + one pill per category filter bar. Selecting a pill
+ * re-renders the grid client-side (no navigation) and syncs `?category=`.
+ * @param {Array<object>} products All products across every category
+ * @returns {Element}
+ */
+function renderFilters(products) {
+  const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+  const params = new URLSearchParams(window.location.search);
+  const active = params.get('category') || '';
+
+  const bar = document.createElement('div');
+  bar.className = 'product-list-filters';
+
+  const gridWrapper = document.createElement('div');
+  gridWrapper.append(renderGrid(active ? products.filter((p) => p.category === active) : products));
+
+  const buttons = ['', ...categories].map((category) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'product-list-filter';
+    button.textContent = category || 'All';
+    button.setAttribute('aria-pressed', String(category === active));
+    button.addEventListener('click', () => {
+      bar.querySelectorAll('.product-list-filter').forEach((btn) => btn.setAttribute('aria-pressed', 'false'));
+      button.setAttribute('aria-pressed', 'true');
+      const filtered = category ? products.filter((p) => p.category === category) : products;
+      gridWrapper.replaceChildren(renderGrid(filtered));
+      const url = new URL(window.location.href);
+      if (category) url.searchParams.set('category', category);
+      else url.searchParams.delete('category');
+      window.history.replaceState({}, '', url);
+    });
+    return button;
+  });
+
+  bar.append(...buttons);
+  return [bar, gridWrapper];
+}
+
 export default async function decorate(block) {
   const category = authoredCategory(block) || pathCategory();
   block.textContent = '';
 
-  const products = await getProductsByCategory(category);
+  if (category) {
+    const products = await getProductsByCategory(category);
+    block.append(renderGrid(products));
+    return;
+  }
+
+  const products = await getProductsByCategory();
   if (!products.length) {
     block.innerHTML = '<p class="product-list-empty">No products found.</p>';
     return;
   }
-
-  const list = document.createElement('ul');
-  list.className = 'product-list-grid';
-  products.forEach((product) => list.append(renderCard(product)));
-  block.append(list);
+  block.append(...renderFilters(products));
 }
