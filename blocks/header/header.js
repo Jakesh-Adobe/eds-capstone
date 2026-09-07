@@ -257,6 +257,17 @@ export default async function decorate(block) {
   if (brandLink) {
     brandLink.className = '';
     brandLink.closest('.button-container').className = '';
+    brandLink.href = '/';
+    // author may have linked only the text; pull any sibling logo image into the same link
+    navBrand.querySelectorAll('picture, img').forEach((logo) => {
+      if (!brandLink.contains(logo)) brandLink.prepend(logo);
+    });
+  } else {
+    // no authored link at all — wrap the whole brand (logo + text) in a home link
+    const home = document.createElement('a');
+    home.href = '/';
+    home.append(...navBrand.childNodes);
+    navBrand.append(home);
   }
 
   const navSections = nav.querySelector('.nav-sections');

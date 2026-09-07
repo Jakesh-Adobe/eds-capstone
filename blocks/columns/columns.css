@@ -32,12 +32,8 @@
   }
 }
 
-/* promo variant — edge-to-edge image beside copy, used on the home page */
-.section.promo > div {
-  max-width: none;
-  padding: 0;
-}
-
+/* promo variant — image beside copy, used on the home page; contained to the
+   same width/inset as every other section so it lines up with the page grid */
 .columns.promo > div {
   gap: 0;
 }

@@ -1,6 +1,7 @@
 import {
   getItems, getTotals, formatPrice, clear,
 } from '../../scripts/cart.js';
+import { addOrder } from '../../scripts/account.js';
 
 function renderItems(list, items) {
   list.innerHTML = items.map((item) => `
@@ -42,7 +43,16 @@ export default function decorate(widget) {
   totalEl.textContent = formatPrice(totals.total, totals.currency);
 
   placeOrder.addEventListener('click', () => {
-    orderIdEl.textContent = `ORD-${Date.now().toString(36).toUpperCase()}`;
+    const orderId = `ORD-${Date.now().toString(36).toUpperCase()}`;
+    addOrder({
+      orderId,
+      date: new Date().toISOString(),
+      status: 'Processing',
+      total: totals.total,
+      currency: totals.currency,
+      itemsCount: totals.count,
+    });
+    orderIdEl.textContent = orderId;
     content.hidden = true;
     confirmation.hidden = false;
     clear();

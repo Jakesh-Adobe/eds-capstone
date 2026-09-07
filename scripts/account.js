@@ -3,31 +3,32 @@ const PROFILE = {
   email: 'jordan.lee@example.com',
 };
 
-const ORDERS = [
-  {
-    orderId: 'ORD-1F2A3B',
-    date: '2026-08-12',
-    status: 'Delivered',
-    total: 45,
-    currency: 'USD',
-    itemsCount: 1,
-  },
-  {
-    orderId: 'ORD-9C7D2E',
-    date: '2026-08-28',
-    status: 'Processing',
-    total: 72.5,
-    currency: 'USD',
-    itemsCount: 2,
-  },
-];
+const ORDERS_KEY = 'eds-orders';
 
 /** Mocked signed-in profile — no backend/auth in this project. */
 export function getProfile() {
   return { ...PROFILE };
 }
 
-/** Mocked order history — no backend/auth in this project. */
+/** Orders placed in this browser, newest first — no backend/auth in this project. */
 export function getOrders() {
-  return ORDERS.map((order) => ({ ...order }));
+  let parsed;
+  try {
+    parsed = JSON.parse(window.localStorage.getItem(ORDERS_KEY));
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  return [...parsed].reverse();
+}
+
+/** Appends a placed order to local order history. */
+export function addOrder(order) {
+  const orders = getOrders().reverse();
+  orders.push(order);
+  try {
+    window.localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  } catch {
+    // quota exceeded or storage disabled — order won't persist, but confirmation still shows
+  }
 }
