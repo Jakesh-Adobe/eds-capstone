@@ -76,43 +76,131 @@ function renderGrid(products) {
 }
 
 /**
- * Renders an "All" + one pill per category filter bar. Selecting a pill
- * re-renders the grid client-side (no navigation) and syncs `?category=`.
- * @param {Array<object>} products All products across every category
- * @returns {Element}
+ * Applies the current title/price/(optional) category filters to a product list.
+ * @param {Array<object>} products
+ * @param {object} filters
+ * @returns {Array<object>}
  */
-function renderFilters(products) {
-  const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+function applyFilters(products, filters) {
+  return products.filter((product) => {
+    if (filters.category && product.category !== filters.category) return false;
+    if (filters.q && !product.title.toLowerCase().includes(filters.q)) return false;
+    if (filters.minPrice != null && product.price < filters.minPrice) return false;
+    if (filters.maxPrice != null && product.price > filters.maxPrice) return false;
+    return true;
+  });
+}
+
+/**
+ * Reads the initial filter state from the URL so filtered views are shareable/bookmarkable.
+ * @param {boolean} withCategory Whether `?category=` applies on this page
+ * @returns {object}
+ */
+function readFiltersFromUrl(withCategory) {
   const params = new URLSearchParams(window.location.search);
-  const active = params.get('category') || '';
+  return {
+    category: withCategory ? (params.get('category') || '') : '',
+    q: (params.get('q') || '').toLowerCase(),
+    minPrice: params.has('minPrice') ? Number(params.get('minPrice')) : null,
+    maxPrice: params.has('maxPrice') ? Number(params.get('maxPrice')) : null,
+  };
+}
 
-  const bar = document.createElement('div');
-  bar.className = 'product-list-filters';
+function writeFiltersToUrl(filters) {
+  const url = new URL(window.location.href);
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value === '' || value === null || value === undefined || Number.isNaN(value)) {
+      url.searchParams.delete(key);
+    } else {
+      url.searchParams.set(key, value);
+    }
+  });
+  window.history.replaceState({}, '', url);
+}
 
+/**
+ * Renders the product list toolbar (title search + price range, plus an
+ * optional "All" + per-category pill bar) and the grid it controls. Every
+ * change re-filters client-side (no navigation) and syncs the URL.
+ * @param {Array<object>} products The products this page can show
+ * @param {{showCategoryFilter: boolean}} options
+ * @returns {Array<Element>}
+ */
+function renderToolbar(products, { showCategoryFilter }) {
+  const filters = readFiltersFromUrl(showCategoryFilter);
+  const toolbar = document.createElement('div');
+  toolbar.className = 'product-list-toolbar';
   const gridWrapper = document.createElement('div');
-  gridWrapper.append(renderGrid(active ? products.filter((p) => p.category === active) : products));
 
-  const buttons = ['', ...categories].map((category) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'product-list-filter';
-    button.textContent = category || 'All';
-    button.setAttribute('aria-pressed', String(category === active));
-    button.addEventListener('click', () => {
-      bar.querySelectorAll('.product-list-filter').forEach((btn) => btn.setAttribute('aria-pressed', 'false'));
-      button.setAttribute('aria-pressed', 'true');
-      const filtered = category ? products.filter((p) => p.category === category) : products;
-      gridWrapper.replaceChildren(renderGrid(filtered));
-      const url = new URL(window.location.href);
-      if (category) url.searchParams.set('category', category);
-      else url.searchParams.delete('category');
-      window.history.replaceState({}, '', url);
+  const rerender = () => {
+    gridWrapper.replaceChildren(renderGrid(applyFilters(products, filters)));
+    writeFiltersToUrl(filters);
+  };
+
+  if (showCategoryFilter) {
+    const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+    const pills = document.createElement('div');
+    pills.className = 'product-list-filters';
+    ['', ...categories].forEach((category) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'product-list-filter';
+      button.textContent = category || 'All';
+      button.setAttribute('aria-pressed', String(category === filters.category));
+      button.addEventListener('click', () => {
+        filters.category = category;
+        pills.querySelectorAll('.product-list-filter').forEach((btn) => btn.setAttribute('aria-pressed', 'false'));
+        button.setAttribute('aria-pressed', 'true');
+        rerender();
+      });
+      pills.append(button);
     });
-    return button;
+    toolbar.append(pills);
+  }
+
+  const searchRow = document.createElement('div');
+  searchRow.className = 'product-list-search-row';
+
+  const search = document.createElement('input');
+  search.type = 'search';
+  search.className = 'product-list-search';
+  search.placeholder = 'Search by name';
+  search.setAttribute('aria-label', 'Search products by name');
+  search.value = filters.q;
+  search.addEventListener('input', () => {
+    filters.q = search.value.trim().toLowerCase();
+    rerender();
   });
 
-  bar.append(...buttons);
-  return [bar, gridWrapper];
+  const minPrice = document.createElement('input');
+  minPrice.type = 'number';
+  minPrice.min = '0';
+  minPrice.className = 'product-list-price-input';
+  minPrice.placeholder = 'Min price';
+  minPrice.setAttribute('aria-label', 'Minimum price');
+  if (filters.minPrice != null) minPrice.value = filters.minPrice;
+  minPrice.addEventListener('input', () => {
+    filters.minPrice = minPrice.value === '' ? null : Number(minPrice.value);
+    rerender();
+  });
+
+  const maxPrice = document.createElement('input');
+  maxPrice.type = 'number';
+  maxPrice.min = '0';
+  maxPrice.className = 'product-list-price-input';
+  maxPrice.placeholder = 'Max price';
+  maxPrice.setAttribute('aria-label', 'Maximum price');
+  if (filters.maxPrice != null) maxPrice.value = filters.maxPrice;
+  maxPrice.addEventListener('input', () => {
+    filters.maxPrice = maxPrice.value === '' ? null : Number(maxPrice.value);
+    rerender();
+  });
+
+  searchRow.append(search, minPrice, maxPrice);
+  toolbar.append(searchRow);
+
+  gridWrapper.append(renderGrid(applyFilters(products, filters)));
+  return [toolbar, gridWrapper];
 }
 
 export default async function decorate(block) {
@@ -120,22 +208,19 @@ export default async function decorate(block) {
   const newArrivals = authoredNewArrivals(block) || isNewArrivalsPath();
   block.textContent = '';
 
-  if (category) {
-    const products = await getProductsByCategory(category);
-    block.append(renderGrid(products));
-    return;
-  }
-
   if (newArrivals) {
     const products = await getNewArrivals();
     block.append(renderGrid(products));
     return;
   }
 
-  const products = await getProductsByCategory();
+  const products = category
+    ? await getProductsByCategory(category)
+    : await getProductsByCategory();
+
   if (!products.length) {
     block.innerHTML = '<p class="product-list-empty">No products found.</p>';
     return;
   }
-  block.append(...renderFilters(products));
+  block.append(...renderToolbar(products, { showCategoryFilter: !category }));
 }

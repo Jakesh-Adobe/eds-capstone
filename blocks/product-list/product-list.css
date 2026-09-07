@@ -70,3 +70,38 @@
   border-color: var(--color-black);
   color: var(--color-white);
 }
+
+.product-list-toolbar {
+  margin-bottom: 24px;
+}
+
+.product-list-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.product-list-search,
+.product-list-price-input {
+  border: 1px solid var(--color-black);
+  border-radius: var(--radius-s);
+  padding: 10px 14px;
+  font-size: var(--body-font-size-s);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.product-list-search {
+  flex: 1 1 220px;
+}
+
+.product-list-price-input {
+  flex: 0 1 140px;
+  width: 140px;
+}
+
+.product-list-search:focus,
+.product-list-price-input:focus {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+}
