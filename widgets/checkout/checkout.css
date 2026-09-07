@@ -84,3 +84,58 @@
 .checkout-confirmation {
   text-align: center;
 }
+
+.checkout-form {
+  margin-top: 24px;
+}
+
+.checkout-form h2 {
+  margin: 0 0 16px;
+}
+
+.checkout-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.checkout-field label {
+  font-size: var(--body-xs);
+  font-weight: 500;
+}
+
+.checkout-field input {
+  border: 1px solid var(--color-black);
+  border-radius: var(--radius-s);
+  padding: 10px 12px;
+  font-size: var(--body-sm);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.checkout-field input:focus {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+}
+
+.checkout-field input[aria-invalid='true'] {
+  border-color: var(--color-error-shade);
+}
+
+.checkout-field-error {
+  min-height: 1.2em;
+  font-size: var(--body-xs);
+  color: var(--color-error-shade);
+}
+
+.checkout-field-row {
+  display: grid;
+  gap: 16px;
+}
+
+@media (width >= 600px) {
+  .checkout-field-row {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
