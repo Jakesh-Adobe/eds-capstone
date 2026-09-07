@@ -202,6 +202,12 @@ header nav .nav-sections ul > li > ul > li {
   font-weight: 400;
 }
 
+header nav .nav-sections a.nav-link-current {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+}
+
 @media (width >= 900px) {
   header nav .nav-sections {
     display: block;

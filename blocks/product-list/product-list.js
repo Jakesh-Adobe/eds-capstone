@@ -1,5 +1,5 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
-import { getProductsByCategory, formatPrice } from '../../scripts/commerce.js';
+import { getProductsByCategory, getNewArrivals, formatPrice } from '../../scripts/commerce.js';
 
 /**
  * Category slug from the current page path, e.g. /category/plants -> "plants".
@@ -8,6 +8,14 @@ import { getProductsByCategory, formatPrice } from '../../scripts/commerce.js';
 function pathCategory() {
   const match = window.location.pathname.match(/^\/category\/([^/]+)/);
   return match ? match[1] : null;
+}
+
+/**
+ * True on the dedicated /new-arrivals page.
+ * @returns {boolean}
+ */
+function isNewArrivalsPath() {
+  return window.location.pathname.replace(/\/$/, '') === '/new-arrivals';
 }
 
 /**
@@ -21,6 +29,17 @@ function authoredCategory(block) {
   if (!link) return null;
   const { pathname } = new URL(link.href, window.location.href);
   return pathname.split('/').filter(Boolean)[1] || null;
+}
+
+/**
+ * Reads an optional authored override: a link to /new-arrivals picks that mode
+ * explicitly, so the block can also be used e.g. on the home page.
+ * @param {Element} block The product-list block element
+ * @returns {boolean}
+ */
+function authoredNewArrivals(block) {
+  const link = block.querySelector('a[href*="/new-arrivals"]');
+  return !!link;
 }
 
 function renderCard(product) {
@@ -98,10 +117,17 @@ function renderFilters(products) {
 
 export default async function decorate(block) {
   const category = authoredCategory(block) || pathCategory();
+  const newArrivals = authoredNewArrivals(block) || isNewArrivalsPath();
   block.textContent = '';
 
   if (category) {
     const products = await getProductsByCategory(category);
+    block.append(renderGrid(products));
+    return;
+  }
+
+  if (newArrivals) {
+    const products = await getNewArrivals();
     block.append(renderGrid(products));
     return;
   }

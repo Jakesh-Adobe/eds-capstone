@@ -11,6 +11,10 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(num) ? num : fallback;
 }
 
+function toBoolean(value) {
+  return String(value).trim().toLowerCase() === 'true';
+}
+
 /**
  * Fetches and caches the site's query index.
  * @returns {Promise<Array<object>>} raw index rows
@@ -39,6 +43,8 @@ function normalizeProduct(row) {
     category: row.category || '',
     price: toNumber(row.price),
     currency: row.currency || 'USD',
+    newArrival: toBoolean(row.newarrival),
+    lastModified: toNumber(row.lastModified),
   };
 }
 
@@ -70,6 +76,18 @@ export async function getAllCategories() {
   const products = await getAllProducts();
   const categories = new Set(products.map((product) => product.category).filter(Boolean));
   return [...categories].sort();
+}
+
+/**
+ * Products flagged as new arrivals (`Newarrival: true` metadata), most recently
+ * modified first.
+ * @returns {Promise<Array<object>>}
+ */
+export async function getNewArrivals() {
+  const products = await getAllProducts();
+  return products
+    .filter((product) => product.newArrival)
+    .sort((a, b) => b.lastModified - a.lastModified);
 }
 
 /**

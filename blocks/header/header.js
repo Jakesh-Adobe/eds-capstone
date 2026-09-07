@@ -272,6 +272,13 @@ export default async function decorate(block) {
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
+    // mark the link matching the current page so it stays visibly highlighted
+    navSections.querySelectorAll('a').forEach((link) => {
+      if (new URL(link.href, window.location.href).pathname === window.location.pathname) {
+        link.classList.add('nav-link-current');
+        link.setAttribute('aria-current', 'page');
+      }
+    });
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
       navSection.addEventListener('click', () => {
